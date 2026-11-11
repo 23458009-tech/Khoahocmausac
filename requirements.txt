@@ -1,7 +1,0 @@
-streamlit>=1.41
-matplotlib>=3.9
-colour-science>=0.4.6,<0.5
-numpy>=1.26,<3
-pandas>=2.2
-scipy>=1.13
-Pillow>=10.4
