@@ -4,52 +4,54 @@ import base64
 import mimetypes
 from pathlib import Path
 
-# ==========================================
-# 1. CẤU HÌNH STREAMLIT
-# ==========================================
+# =====================================================
+# 1. CẤU HÌNH WEBSITE
+# =====================================================
 
 st.set_page_config(
     page_title="Khoa học Màu sắc | HCMUTE",
     page_icon="🎨",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
-# ==========================================
+# =====================================================
 # 2. HÀM ĐỌC HÌNH ẢNH
-# ==========================================
+# =====================================================
 
-def get_image(path):
+def image_to_base64(filename):
 
-    file = Path(path)
+    path = Path(filename)
 
-    if not file.exists():
-        st.error(f"Không tìm thấy hình ảnh: {path}")
+    if not path.exists():
+        st.error(f"Không tìm thấy file hình ảnh: {filename}")
         st.stop()
 
-    mime, _ = mimetypes.guess_type(str(file))
+    mime_type, _ = mimetypes.guess_type(str(path))
 
-    if not mime:
-        mime = "image/png"
+    if not mime_type:
+        mime_type = "image/png"
 
-    with open(file, "rb") as f:
-        encoded = base64.b64encode(f.read()).decode("utf-8")
+    with open(path, "rb") as file:
+        encoded = base64.b64encode(
+            file.read()
+        ).decode("utf-8")
 
-    return f"data:{mime};base64,{encoded}"
-
-
-# ==========================================
-# 3. NẠP HÌNH ẢNH
-# ==========================================
-
-background = get_image("background_hcmute.png")
-logo_hcmute = get_image("logo_hcmute.png")
-logo_khoa = get_image("logo_khoa.png")
+    return f"data:{mime_type};base64,{encoded}"
 
 
-# ==========================================
+# =====================================================
+# 3. TẢI HÌNH ẢNH
+# =====================================================
+
+background = image_to_base64("background_hcmute.png")
+logo_hcmute = image_to_base64("logo_hcmute.png")
+logo_khoa = image_to_base64("logo_khoa.png")
+
+
+# =====================================================
 # 4. THÔNG TIN SINH VIÊN
-# ==========================================
+# =====================================================
 
 ten_sinh_vien = "Nguyễn Hoàng Khiêm"
 mssv = "23458009"
@@ -62,85 +64,135 @@ loi_chao = (
 )
 
 
-# ==========================================
-# 5. HTML + CSS
-# ==========================================
+# =====================================================
+# 5. CSS TOÀN WEBSITE
+# =====================================================
 
-html_code = f"""
+css = """
 <style>
 
-/* XÓA GIAO DIỆN MẶC ĐỊNH */
+/* =========================================
+   THIẾT LẬP CHUNG
+========================================= */
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
 
 #MainMenu,
-footer,
-header,
-[data-testid="stHeader"],
-[data-testid="stToolbar"],
-[data-testid="stSidebar"],
-[data-testid="stSidebarNav"],
-[data-testid="collapsedControl"] {{
-    display: none !important;
-    visibility: hidden !important;
-}}
+footer {
+    visibility: hidden;
+}
 
-/* NỀN TOÀN TRANG */
+/* =========================================
+   HÌNH NỀN TOÀN WEBSITE
+========================================= */
 
-html, body {{
-    margin: 0 !important;
-    padding: 0 !important;
-}}
-
-.stApp,
-[data-testid="stAppViewContainer"],
-[data-testid="stMain"],
-.main {{
-    background: transparent !important;
-}}
-
-.stApp {{
-    background-image: url("{background}") !important;
-    background-size: cover !important;
-    background-position: center center !important;
-    background-repeat: no-repeat !important;
-    background-attachment: fixed !important;
+.stApp {
+    background-image: url("__BACKGROUND__");
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     min-height: 100vh;
-}}
+}
 
-/* KHU VỰC CHÍNH */
+/* Khu vực nội dung trong suốt */
 
-[data-testid="stMainBlockContainer"] {{
+[data-testid="stMain"],
+[data-testid="stAppViewContainer"] {
+    background: transparent !important;
+}
+
+/* =========================================
+   SIDEBAR - THANH BÊN TRÁI
+========================================= */
+
+[data-testid="stSidebar"] {
+    display: block !important;
+    visibility: visible !important;
+    min-width: 270px;
+    width: 270px;
+    background-color: #F7F8FA !important;
+    border-right: 1px solid #E1E1E1;
+}
+
+[data-testid="stSidebarContent"] {
+    padding-top: 25px;
+    background-color: #F7F8FA !important;
+}
+
+/* Giữ lại danh sách điều hướng */
+
+[data-testid="stSidebarNav"] {
+    display: block !important;
+    visibility: visible !important;
+}
+
+/* Chữ trong thanh điều hướng */
+
+[data-testid="stSidebarNav"] span {
+    font-size: 14px;
+}
+
+/* Hiệu ứng mục đang chọn */
+
+[data-testid="stSidebarNav"] a[aria-current="page"] {
+    background-color: #E6EDF8;
+    border-radius: 8px;
+    font-weight: 700;
+}
+
+/* Nút thu gọn sidebar */
+
+[data-testid="collapsedControl"] {
+    display: flex !important;
+    visibility: visible !important;
+}
+
+/* =========================================
+   KHU VỰC NỘI DUNG BÊN PHẢI
+========================================= */
+
+[data-testid="stMainBlockContainer"],
+.main .block-container {
     max-width: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
-}}
+}
 
-/* KHUNG BAO */
+/* =========================================
+   KHUNG BAO NGOÀI
+========================================= */
 
-.main-wrapper {{
+.main-wrapper {
 
     width: 100%;
     min-height: 100vh;
 
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
 
-    padding: 3.5%;
+    padding: 35px;
     box-sizing: border-box;
-}}
+}
 
-/* KHUNG TRONG SUỐT */
+/* =========================================
+   KHUNG KÍNH TRONG SUỐT
+========================================= */
 
-.content-card {{
+.content-card {
 
     width: 100%;
     max-width: 1450px;
 
-    min-height: 86vh;
+    min-height: calc(100vh - 100px);
+
+    padding: 45px 35px;
 
     box-sizing: border-box;
-
-    padding: 40px 35px;
 
     display: flex;
     flex-direction: column;
@@ -149,35 +201,43 @@ html, body {{
 
     text-align: center;
 
-    background: rgba(225, 245, 255, 0.76);
+    background: rgba(225, 245, 255, 0.77);
 
-    border: 1px solid rgba(255,255,255,0.8);
+    border: 1px solid rgba(255, 255, 255, 0.8);
 
     border-radius: 55px;
 
     box-shadow:
-        0 8px 30px rgba(0, 70, 140, 0.20),
-        inset 0 0 20px rgba(255,255,255,0.25);
+        0 8px 30px rgba(0, 70, 140, 0.18),
+        inset 0 0 20px rgba(255, 255, 255, 0.25);
 
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-}}
+}
 
-/* LOGO TRƯỜNG */
+/* =========================================
+   LOGO HCMUTE
+========================================= */
 
-.school-logo {{
+.school-logo {
+
+    display: block;
 
     width: min(760px, 85%);
     height: 145px;
 
     object-fit: contain;
 
-    margin-bottom: 35px;
-}}
+    margin: 0 auto 35px;
+}
 
-/* LOGO KHOA */
+/* =========================================
+   LOGO KHOA
+========================================= */
 
-.faculty-logo {{
+.faculty-logo {
+
+    display: block;
 
     width: 360px;
     max-width: 80%;
@@ -186,12 +246,14 @@ html, body {{
 
     object-fit: contain;
 
-    margin-bottom: 15px;
-}}
+    margin: 0 auto 15px;
+}
 
-/* TÊN KHOA */
+/* =========================================
+   TÊN KHOA
+========================================= */
 
-.faculty-title {{
+.faculty-title {
 
     color: #0754D9;
 
@@ -201,12 +263,18 @@ html, body {{
 
     line-height: 1.4;
 
-    text-shadow: 1px 2px 2px white;
-}}
+    margin: 0;
 
-/* LỜI CHÀO */
+    text-transform: uppercase;
 
-.welcome-title {{
+    text-shadow: 1px 2px 2px rgba(255,255,255,0.95);
+}
+
+/* =========================================
+   LỜI CHÀO
+========================================= */
+
+.welcome-title {
 
     color: #0750D5;
 
@@ -218,12 +286,14 @@ html, body {{
 
     margin-top: 65px;
 
-    text-shadow: 1px 2px 3px white;
-}}
+    text-shadow: 1px 2px 3px rgba(255,255,255,0.95);
+}
 
-/* THÔNG TIN SINH VIÊN */
+/* =========================================
+   THÔNG TIN SINH VIÊN
+========================================= */
 
-.student-name {{
+.student-name {
 
     color: #0750D5;
 
@@ -235,64 +305,94 @@ html, body {{
 
     margin-top: 5px;
 
-    text-shadow: 1px 2px 3px white;
-}}
+    text-shadow: 1px 2px 3px rgba(255,255,255,0.95);
+}
 
-/* RESPONSIVE TABLET */
+/* =========================================
+   RESPONSIVE - TABLET
+========================================= */
 
-@media (max-width: 768px) {{
+@media (max-width: 768px) {
 
-    .main-wrapper {{
+    [data-testid="stSidebar"] {
+        min-width: 250px;
+        width: 250px;
+    }
+
+    .main-wrapper {
         padding: 18px;
-    }}
+    }
 
-    .content-card {{
+    .content-card {
         min-height: 90vh;
         padding: 35px 15px;
         border-radius: 30px;
-    }}
+    }
 
-    .school-logo {{
+    .school-logo {
         height: 105px;
         margin-bottom: 25px;
-    }}
+    }
 
-    .faculty-logo {{
+    .faculty-logo {
         height: 110px;
-    }}
+    }
 
-    .welcome-title {{
+    .welcome-title {
         margin-top: 40px;
-    }}
-}}
+    }
+}
 
-/* RESPONSIVE MOBILE */
+/* =========================================
+   RESPONSIVE - ĐIỆN THOẠI
+========================================= */
 
-@media (max-width: 480px) {{
+@media (max-width: 480px) {
 
-    .content-card {{
+    .main-wrapper {
+        padding: 12px;
+    }
+
+    .content-card {
+        min-height: 90vh;
         padding: 25px 12px;
-    }}
+        border-radius: 25px;
+    }
 
-    .school-logo {{
+    .school-logo {
         height: 85px;
-    }}
+    }
 
-    .faculty-logo {{
+    .faculty-logo {
         height: 95px;
-    }}
+    }
 
-    .welcome-title {{
+    .welcome-title {
         margin-top: 30px;
-    }}
-}}
+    }
+}
 
 </style>
+"""
 
+# Thay đường dẫn ảnh nền vào CSS
+css = css.replace("__BACKGROUND__", background)
+
+# Hiển thị CSS
+st.markdown(css, unsafe_allow_html=True)
+
+
+# =====================================================
+# 6. TẠO HTML TRANG CHỦ
+# =====================================================
+
+html_code = f"""
 
 <div class="main-wrapper">
 
     <div class="content-card">
+
+        <!-- LOGO TRƯỜNG HCMUTE -->
 
         <img
             src="{logo_hcmute}"
@@ -300,19 +400,27 @@ html, body {{
             alt="Logo HCMUTE"
         >
 
+        <!-- LOGO FACULTY OF ARTS & MEDIA -->
+
         <img
             src="{logo_khoa}"
             class="faculty-logo"
             alt="Faculty of Arts and Media"
         >
 
+        <!-- TÊN KHOA -->
+
         <div class="faculty-title">
             {ten_khoa}
         </div>
 
+        <!-- LỜI CHÀO MỪNG -->
+
         <div class="welcome-title">
             {loi_chao}
         </div>
+
+        <!-- THÔNG TIN SINH VIÊN -->
 
         <div class="student-name">
             Mình tên là {ten_sinh_vien},
@@ -322,10 +430,8 @@ html, body {{
     </div>
 
 </div>
+
 """
 
-# ==========================================
-# 6. HIỂN THỊ WEBSITE
-# ==========================================
-
-st.html(html_code)
+# Hiển thị HTML trang chủ
+st.markdown(html_code, unsafe_allow_html=True)
