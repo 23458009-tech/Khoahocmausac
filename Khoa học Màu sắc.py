@@ -4,9 +4,9 @@ import base64
 import mimetypes
 from pathlib import Path
 
-# ==================================================
-# 1. CẤU HÌNH TRANG WEB
-# ==================================================
+# ==========================================
+# 1. CẤU HÌNH STREAMLIT
+# ==========================================
 
 st.set_page_config(
     page_title="Khoa học Màu sắc | HCMUTE",
@@ -15,40 +15,41 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ==================================================
-# 2. ĐỌC VÀ CHUYỂN HÌNH ẢNH SANG BASE64
-# ==================================================
+# ==========================================
+# 2. HÀM ĐỌC HÌNH ẢNH
+# ==========================================
 
-def image_to_base64(filename):
+def get_image(path):
 
-    path = Path(filename)
+    file = Path(path)
 
-    if not path.exists():
-        st.error(f"Không tìm thấy file: {filename}")
+    if not file.exists():
+        st.error(f"Không tìm thấy hình ảnh: {path}")
         st.stop()
 
-    mime_type, _ = mimetypes.guess_type(str(path))
+    mime, _ = mimetypes.guess_type(str(file))
 
-    if not mime_type:
-        mime_type = "image/png"
+    if not mime:
+        mime = "image/png"
 
-    with open(path, "rb") as file:
-        encoded = base64.b64encode(
-            file.read()
-        ).decode("utf-8")
+    with open(file, "rb") as f:
+        encoded = base64.b64encode(f.read()).decode("utf-8")
 
-    return f"data:{mime_type};base64,{encoded}"
+    return f"data:{mime};base64,{encoded}"
 
 
-# Đường dẫn hình ảnh
-background = image_to_base64("background_hcmute.png")
-logo_hcmute = image_to_base64("logo_hcmute.png")
-logo_khoa = image_to_base64("logo_khoa.png")
+# ==========================================
+# 3. NẠP HÌNH ẢNH
+# ==========================================
+
+background = get_image("background_hcmute.png")
+logo_hcmute = get_image("logo_hcmute.png")
+logo_khoa = get_image("logo_khoa.png")
 
 
-# ==================================================
-# 3. THÔNG TIN SINH VIÊN
-# ==================================================
+# ==========================================
+# 4. THÔNG TIN SINH VIÊN
+# ==========================================
 
 ten_sinh_vien = "Nguyễn Hoàng Khiêm"
 mssv = "23458009"
@@ -61,46 +62,62 @@ loi_chao = (
 )
 
 
-# ==================================================
-# 4. THIẾT KẾ GIAO DIỆN CSS
-# ==================================================
+# ==========================================
+# 5. HTML + CSS
+# ==========================================
 
-st.markdown(f"""
+html_code = f"""
 <style>
 
-/* XÓA GIAO DIỆN MẶC ĐỊNH STREAMLIT */
+/* XÓA GIAO DIỆN MẶC ĐỊNH */
 
-#MainMenu {{
-    display: none;
+#MainMenu,
+footer,
+header,
+[data-testid="stHeader"],
+[data-testid="stToolbar"],
+[data-testid="stSidebar"],
+[data-testid="stSidebarNav"],
+[data-testid="collapsedControl"] {{
+    display: none !important;
+    visibility: hidden !important;
 }}
 
-footer {{
-    display: none;
+/* NỀN TOÀN TRANG */
+
+html, body {{
+    margin: 0 !important;
+    padding: 0 !important;
 }}
 
-header {{
-    display: none;
+.stApp,
+[data-testid="stAppViewContainer"],
+[data-testid="stMain"],
+.main {{
+    background: transparent !important;
 }}
 
 .stApp {{
-    background-image: url("{background}");
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
+    background-image: url("{background}") !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+    min-height: 100vh;
 }}
 
-/* CĂN CHỈNH TOÀN TRANG */
+/* KHU VỰC CHÍNH */
 
-.block-container {{
+[data-testid="stMainBlockContainer"] {{
     max-width: 100% !important;
     padding: 0 !important;
     margin: 0 !important;
 }}
 
-/* KHUNG CHÍNH */
+/* KHUNG BAO */
 
 .main-wrapper {{
+
     width: 100%;
     min-height: 100vh;
 
@@ -108,60 +125,59 @@ header {{
     align-items: center;
     justify-content: center;
 
-    padding: 35px;
+    padding: 3.5%;
     box-sizing: border-box;
 }}
 
-/* KHUNG NỘI DUNG TRONG SUỐT */
+/* KHUNG TRONG SUỐT */
 
 .content-card {{
 
     width: 100%;
     max-width: 1450px;
 
-    min-height: 92vh;
-
-    padding: 45px 35px;
+    min-height: 86vh;
 
     box-sizing: border-box;
+
+    padding: 40px 35px;
 
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: flex-start;
 
     text-align: center;
 
-    background: rgba(224, 244, 255, 0.77);
+    background: rgba(225, 245, 255, 0.76);
 
-    border: 1px solid rgba(255,255,255,0.75);
+    border: 1px solid rgba(255,255,255,0.8);
 
     border-radius: 55px;
 
     box-shadow:
-        0 8px 30px rgba(0, 80, 150, 0.18),
+        0 8px 30px rgba(0, 70, 140, 0.20),
         inset 0 0 20px rgba(255,255,255,0.25);
 
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
 }}
 
-/* LOGO TRƯỜNG HCMUTE */
+/* LOGO TRƯỜNG */
 
 .school-logo {{
-    display: block;
 
     width: min(760px, 85%);
     height: 145px;
 
     object-fit: contain;
 
-    margin: 0 auto 35px;
+    margin-bottom: 35px;
 }}
 
 /* LOGO KHOA */
 
 .faculty-logo {{
-    display: block;
 
     width: 360px;
     max-width: 80%;
@@ -170,7 +186,7 @@ header {{
 
     object-fit: contain;
 
-    margin: 0 auto 15px;
+    margin-bottom: 15px;
 }}
 
 /* TÊN KHOA */
@@ -185,12 +201,7 @@ header {{
 
     line-height: 1.4;
 
-    margin: 0;
-
-    text-transform: uppercase;
-
-    text-shadow:
-        1px 2px 2px rgba(255,255,255,0.95);
+    text-shadow: 1px 2px 2px white;
 }}
 
 /* LỜI CHÀO */
@@ -207,8 +218,7 @@ header {{
 
     margin-top: 65px;
 
-    text-shadow:
-        1px 2px 3px rgba(255,255,255,0.95);
+    text-shadow: 1px 2px 3px white;
 }}
 
 /* THÔNG TIN SINH VIÊN */
@@ -225,47 +235,43 @@ header {{
 
     margin-top: 5px;
 
-    text-shadow:
-        1px 2px 3px rgba(255,255,255,0.95);
+    text-shadow: 1px 2px 3px white;
 }}
 
-
-/* ==================================================
-   5. RESPONSIVE - MÁY TÍNH BẢNG VÀ ĐIỆN THOẠI
-================================================== */
+/* RESPONSIVE TABLET */
 
 @media (max-width: 768px) {{
 
     .main-wrapper {{
-        padding: 15px;
+        padding: 18px;
     }}
 
     .content-card {{
-        min-height: 94vh;
+        min-height: 90vh;
         padding: 35px 15px;
         border-radius: 30px;
     }}
 
     .school-logo {{
-        height: 100px;
+        height: 105px;
         margin-bottom: 25px;
     }}
 
     .faculty-logo {{
         height: 110px;
-        margin-top: 15px;
     }}
 
     .welcome-title {{
-        margin-top: 45px;
+        margin-top: 40px;
     }}
-
 }}
+
+/* RESPONSIVE MOBILE */
 
 @media (max-width: 480px) {{
 
     .content-card {{
-        padding: 30px 12px;
+        padding: 25px 12px;
     }}
 
     .school-logo {{
@@ -277,26 +283,16 @@ header {{
     }}
 
     .welcome-title {{
-        margin-top: 35px;
+        margin-top: 30px;
     }}
-
 }}
 
 </style>
-""", unsafe_allow_html=True)
 
-
-# ==================================================
-# 6. HIỂN THỊ WEBSITE
-# ==================================================
-
-st.markdown(f"""
 
 <div class="main-wrapper">
 
     <div class="content-card">
-
-        <!-- LOGO TRƯỜNG HCMUTE -->
 
         <img
             src="{logo_hcmute}"
@@ -304,27 +300,19 @@ st.markdown(f"""
             alt="Logo HCMUTE"
         >
 
-        <!-- LOGO FACULTY OF ARTS AND MEDIA -->
-
         <img
             src="{logo_khoa}"
             class="faculty-logo"
             alt="Faculty of Arts and Media"
         >
 
-        <!-- TÊN KHOA -->
-
         <div class="faculty-title">
             {ten_khoa}
         </div>
 
-        <!-- LỜI CHÀO MỪNG -->
-
         <div class="welcome-title">
             {loi_chao}
         </div>
-
-        <!-- THÔNG TIN SINH VIÊN -->
 
         <div class="student-name">
             Mình tên là {ten_sinh_vien},
@@ -334,5 +322,10 @@ st.markdown(f"""
     </div>
 
 </div>
+"""
 
-""", unsafe_allow_html=True)
+# ==========================================
+# 6. HIỂN THỊ WEBSITE
+# ==========================================
+
+st.html(html_code)
