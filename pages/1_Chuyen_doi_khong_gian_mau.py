@@ -3,7 +3,7 @@ import numpy as np
 import colour
 from utils.ui import apply_theme, page_header
 
-def apply_theme(background_file="background_hcmute-2.png"):
+def apply_theme(background_file="background_hcmute-1.png"):
     background = asset_uri(background_file)
 page_header("Chuyển đổi không gian màu", "Chuyển đổi giữa sRGB và XYZ theo thư viện Colour Science.")
 
