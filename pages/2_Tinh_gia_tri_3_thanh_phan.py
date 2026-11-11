@@ -4,7 +4,8 @@ import numpy as np
 import colour
 from utils.ui import apply_theme, page_header
 
-apply_theme()
+def apply_theme(background_file="background_hcmute.png"):
+    background = asset_uri(background_file)
 page_header("Tính giá trị 3 thành phần", "Đọc phổ phản xạ từ CSV và tính các giá trị kích thích màu CIE XYZ.")
 
 uploaded = st.file_uploader("Tải tệp CSV phổ phản xạ", type=["csv"])
